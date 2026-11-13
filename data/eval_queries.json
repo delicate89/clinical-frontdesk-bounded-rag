@@ -38,7 +38,7 @@
   },
   {
     "id": "Q07",
-    "query": "How do I renew my vehicle registration tax online?",
+    "query": "How do I renew my vehicle tax online?",
     "expected_action": "ABSTAIN_OOD"
   },
   {
