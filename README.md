@@ -59,6 +59,8 @@ During our August 2026 capstone evaluation, we tested the retrieval and guardrai
 
 ## Quickstart
 
+## Quickstart
+
 ```bash
 # 1. Clone repository and install lightweight dependencies
 git clone https://github.com
@@ -66,8 +68,9 @@ cd clinical-frontdesk-bounded-rag
 pip install -r requirements.txt
 
 # 2. Run the 9-query unit smoke test
-python eval/run_benchmark.py
+PYTHONPATH=. python eval/run_benchmark.py
 ```
+
 
 ## Current Limitations & Next Engineering Steps (August 2026)
 * **Multilingual & Code-Switched Queries:** Public-hospital patients frequently mix English medical terms with Urdu or Punjabi phrasing; future iterations require bilingual embeddings and localized normalization.
