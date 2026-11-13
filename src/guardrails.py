@@ -17,7 +17,7 @@ class GuardrailDecision:
 class BoundedClinicalRetriever:
     """
     Implements pre-retrieval safety gates and cosine-similarity abstention
-    thresholds (tau = 0.76 for dense embeddings; calibrated equivalent for TF-IDF)
+    thresholds (tau = 0.76 for dense embeddings; calibrated 0.18 for TF-IDF)
     to prevent hallucinated medical advice and out-of-distribution responses.
     """
 
@@ -35,10 +35,12 @@ class BoundedClinicalRetriever:
         r"bypass (security|access|rbac)",
     ]
 
-    def __init__(self, knowledge_base: List[dict], similarity_threshold: float = 0.22):
+    def __init__(self, knowledge_base: List[dict], similarity_threshold: float = 0.18):
         self.kb = knowledge_base
         self.threshold = similarity_threshold
-        self.vectorizer = TfidfVectorizer(ngram_range=(1, 2), stop_words="english")
+        self.vectorizer = TfidfVectorizer(
+            ngram_range=(1, 2), stop_words="english", sublinear_tf=True
+        )
         corpus = [f"{item['title']} {item['content']}" for item in self.kb]
         self.kb_matrix = self.vectorizer.fit_transform(corpus)
 
@@ -90,3 +92,4 @@ class BoundedClinicalRetriever:
             matched_doc_id=best_doc["doc_id"],
             message=best_doc["content"],
         )
+
