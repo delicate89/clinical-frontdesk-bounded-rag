@@ -1,44 +1,32 @@
-import json
-import sys
-from pathlib import Path
-
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
-
-from src.pipeline import ClinicalFrontDeskPipeline
-from src.rbac_scheduler import SessionContext
-
-
-def main():
-    kb = json.loads((ROOT / "data" / "clinic_kb.json").read_text(encoding="utf-8"))
-    queries = json.loads((ROOT / "data" / "eval_queries.json").read_text(encoding="utf-8"))
-
-    pipeline = ClinicalFrontDeskPipeline(kb)
-    passed = 0
-
-    print(f"{'ID':<5} | {'Expected':<22} | {'Actual':<22} | {'Conf':<6} | Status")
-    print("-" * 78)
-
-    for item in queries:
-        session = SessionContext(
-            session_id="SESS-01",
-            authenticated_patient_id=item.get("session_patient_id", "PT-1042"),
-            role="PATIENT",
-        )
-        decision = pipeline.handle_request(item["query"], session)
-        ok = decision.action == item["expected_action"]
-        if ok:
-            passed += 1
-        status_str = "PASS" if ok else "FAIL"
-        print(
-            f"{item['id']:<5} | {item['expected_action']:<22} | {decision.action:<22} | {decision.confidence:<6.2f} | {status_str}"
-        )
-
-    accuracy = (passed / len(queries)) * 100
-    print("-" * 78)
-    print(f"Unit Smoke Test Complete: {passed}/{len(queries)} passed ({accuracy:.1f}% accuracy)")
-    print("Note: Full 120-query GIKI capstone evaluation benchmark achieved 91.7% overall accuracy.")
-
-
-if __name__ == "__main__":
-    main()
+[
+  {
+    "doc_id": "KB-001",
+    "category": "opd_hours",
+    "title": "Outpatient Department (OPD) Registration & Timings",
+    "content": "General OPD registration operates Monday through Saturday from 8:00 AM to 2:00 PM. Patients must present a valid National Identity Card (CNIC) or existing HMIS token at Counter 1."
+  },
+  {
+    "doc_id": "KB-002",
+    "category": "specialty_clinics",
+    "title": "Specialty Clinic Days and Schedule",
+    "content": "Cardiology and Internal Medicine specialty clinics run on Mondays and Wednesdays. Pediatrics and Maternal Health clinics run on Tuesdays and Thursdays. Orthopedic follow-ups run on Fridays."
+  },
+  {
+    "doc_id": "KB-003",
+    "category": "diagnostics",
+    "title": "Laboratory & Radiology Sample Collection",
+    "content": "Routine pathology blood sample collection runs from 8:00 AM to 11:30 AM. Fasting glucose and lipid panels require 10 to 12 hours of prior fasting. Ultrasound tokens are issued at Radiology Desk B."
+  },
+  {
+    "doc_id": "KB-004",
+    "category": "emergency",
+    "title": "24/7 Emergency & Trauma Triage",
+    "content": "The Emergency Department operates 24 hours a day, 7 days a week for acute trauma, chest pain, severe dyspnea, and obstetric emergencies. No prior OPD appointment token is required."
+  },
+  {
+    "doc_id": "KB-005",
+    "category": "records",
+    "title": "Medical Record & Discharge Summary Requests",
+    "content": "Copies of inpatient discharge summaries and HMIS encounter records can be requested at the Medical Records Office between 9:00 AM and 1:00 PM with patient CNIC verification."
+  }
+]
